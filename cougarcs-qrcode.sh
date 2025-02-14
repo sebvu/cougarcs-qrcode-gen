@@ -4,8 +4,9 @@
 # This script exists for CougarCS QR code event creations.
 # - Jester
 
-PATH_TO_IMAGES="$HOME/Pictures/cougarcsimages/main-cougarcs-images"
-PATH_TO_QRCODES="$HOME/Pictures/cougarcsimages/qrcodes"
+PATH_TO_IMAGES="./assets"
+PATH_TO_QRCODES="./generated-qrcodes"
+TEMP_FILENAME="TMP"
 
 generate() {
     OPTION=$1
@@ -14,19 +15,21 @@ generate() {
     FILE_NAME=$4
     URL=$5
 
-    mkdir -p "$PATH_TO_QRCODES/TMP/"
-    qrencode -o "$PATH_TO_QRCODES/TMP/temporary.png" -l H -s 32 "$URL"
-    magick "$PATH_TO_QRCODES/TMP/temporary.png" -fill "$COLOR" -opaque black "$PATH_TO_QRCODES/TMP/temporary-recolored.png"
+    mkdir -p "$PATH_TO_QRCODES/$TEMP_FILENAME/"
+    qrencode -o "$PATH_TO_QRCODES/$TEMP_FILENAME/temporary.png" -l H -s 32 "$URL"
+    magick "$PATH_TO_QRCODES/$TEMP_FILENAME/temporary.png" -fill "$COLOR" -opaque black "$PATH_TO_QRCODES/$TEMP_FILENAME/temporary-recolored.png"
 
     if [ "$(echo "$OVERLAY_IMAGE" | tr '[:upper:]' '[:lower:]')" != "none" ]; then
-        magick "$OVERLAY_IMAGE" -resize 300x300 "$PATH_TO_QRCODES/overlaytemp.png"
-        composite -gravity center "$PATH_TO_QRCODES/overlaytemp.png" "$PATH_TO_QRCODES/TMP/temporary-recolored.png" "$PATH_TO_QRCODES/$OPTION-$FILE_NAME.png"
+        magick "$OVERLAY_IMAGE" -resize 300x300 "$PATH_TO_QRCODES/$TEMP_FILENAME/overlaytemp.png"
+        composite -gravity center "$PATH_TO_QRCODES/$TEMP_FILENAME/overlaytemp.png" "$PATH_TO_QRCODES/$TEMP_FILENAME/temporary-recolored.png" "$PATH_TO_QRCODES/$OPTION-$FILE_NAME.png"
     else
-        mv "$PATH_TO_QRCODES/TMP/temporary-recolored.png" "$PATH_TO_QRCODES/$OPTION-$FILE_NAME.png"
+        mv "$PATH_TO_QRCODES/$TEMP_FILENAME/temporary-recolored.png" "$PATH_TO_QRCODES/$OPTION-$FILE_NAME.png"
     fi
-    rm -rf "$PATH_TO_QRCODES/TMP/"
-    echo -e "\033[1;32mQR Code Successfully Generated in $PATH_TO_QRCODES/$OPTION-$FILE_NAME.png"
+    rm -rf "$PATH_TO_QRCODES/$TEMP_FILENAME/"
+    echo -e "\033[1;32mQR Code 'Supposably' Exexuted in $PATH_TO_QRCODES/$OPTION-$FILE_NAME.png"
 }
+
+# need to implement
 
 # COLLAB_LOGOS() {
 #
@@ -154,9 +157,11 @@ custom_generate() {
     fi
 }
 
+# Main Script
+
 if [[ $# -eq 0 ]]; then
     echo -e "\033[1;31mToo little arguments.\n"
-    echo -e "USAGE: $0 [collab|webdev|infosec|tutoring|mainline] [specific-parameters]"
+    echo -e "USAGE: $0 [collab|custom|webdev|infosec|tutoring|mainline] [specific-parameters]"
     exit 1
 fi
 
@@ -166,6 +171,7 @@ case "$1" in
         main_generate "$@"
     ;;
     collab)
+        # not implemented don't use
         collab_generate "$@"
     ;;
     custom)
@@ -173,7 +179,7 @@ case "$1" in
     ;;
     *) 
         echo -e "\033[1;31mInvalid option.\n"
-        echo -e "USAGE: $0 [collab|webdev|infosec|tutoring|mainline] [specific-parameters]"
+        echo -e "USAGE: $0 [collab|custom|webdev|infosec|tutoring|mainline] [specific-parameters]"
     ;;
 esac
 
